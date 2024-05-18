@@ -7,9 +7,8 @@ export const chatController = {
 
         try {
             const response = await generateResponse(message);
-            const followUpQuestions = suggestFollowUpQuestions(message, response);
-
-            res.json({ response, followUpQuestions });
+            const followUpQuestions = await suggestFollowUpQuestions();
+            res.json({ response: response?.content, followUpQuestions });
         } catch (error) {
             next(error);
         }

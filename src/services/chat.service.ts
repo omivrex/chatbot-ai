@@ -1,46 +1,51 @@
-import axios from "axios";
 import { config } from "../configs/config";
+import { Message } from "../types/messages.types";
 
-interface AIResponse {
-    data: {
-        choices: {
-            text: string;
-        }[];
-    };
-}
+const OpenAi = config.openAi;
 
-export async function generateResponse(message: string): Promise<string> {
+// The appropriate way to store this is using a caching service like redis
+const messages: Message[] = [{ role: "system", content: "Be a good assistant" }];
+export async function generateResponse(message: string): Promise<Message | undefined> {
     try {
-        const response = await axios.post<AIResponse>(
-            "https://api.openai.com/v1/completions",
-            {
-                model: "text-davinci-002",
-                prompt: message,
-                max_tokens: 50,
-                temperature: 0.7,
-                n: 1,
-                stop: ["\n"],
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${config.openaiApiKey}`,
-                },
-            }
-        );
-
-        return response.data.choices[0].text.trim();
+        const userPrompt: Message = { role: "user", content: message };
+        messages.push(userPrompt);
+        const chatCompletion = await OpenAi.chat.completions.create({
+            messages,
+            model: "gpt-3.5-turbo",
+        });
+        if (chatCompletion.choices[0].message.content) {
+            const aiResponse: Message = {
+                role: "assistant",
+                content: chatCompletion.choices[0].message.content,
+            };
+            messages.push(aiResponse);
+            return aiResponse;
+        } else {
+            throw new Error("Failed to get response from OpenAIl, message content is null");
+        }
     } catch (error) {
-        throw new Error("Failed to generate response");
+        throw error;
     }
 }
 
-export function suggestFollowUpQuestions(userMessage: string, response: string): string[] {
-    // Mock follow-up questions
-    return [
-        `How many billionaires are there in the United States compared to other countries?`,
-        `What industries are most common among billionaires in the United States?`,
-        `Who is currently the richest billionaire in the world and what is their net worth?`,
-        `How has the number of billionaires changed over the past decade in the United States?`,
-    ];
+const NUMBER_OF_FOLLOWUP_QUESTIONS = 4;
+const FOLLOWUP_QUESTION_PROMPT: Message = {
+    role: "system",
+    content: `generate ${NUMBER_OF_FOLLOWUP_QUESTIONS} followup questions for the last message. Return the questions in a json array of the format [{"question": string},...]`,
+};
+export async function suggestFollowUpQuestions(): Promise<void> {
+    try {
+        const chatCompletion = await OpenAi.chat.completions.create({
+            messages: [...messages, FOLLOWUP_QUESTION_PROMPT],
+            model: "gpt-3.5-turbo",
+        });
+        if (chatCompletion.choices[0].message.content) {
+            const followupQuestion = JSON.parse(chatCompletion.choices[0].message.content);
+            return followupQuestion;
+        } else {
+            throw new Error("Failed to generate follow-up questions from OpenAIl, message content is null");
+        }
+    } catch (error) {
+        throw error;
+    }
 }

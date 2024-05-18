@@ -6,6 +6,7 @@ import { requestLogger } from "./middlewares/requestLogger.middleware";
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 app.use("/api", chatRoutes);
 
