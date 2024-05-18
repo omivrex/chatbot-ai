@@ -42,8 +42,9 @@ export async function suggestFollowUpQuestions(): Promise<void> {
             messages: truncateMessages([...messagesCache, FOLLOWUP_QUESTION_PROMPT], MAX_TOKENS),
             model: "gpt-3.5-turbo",
         });
-        if (chatCompletion.choices[0].message.content) {
-            const followupQuestion = JSON.parse(chatCompletion.choices[0].message.content);
+        const response = chatCompletion.choices[0].message.content;
+        if (response) {
+            const followupQuestion = JSON.parse(response);
             return followupQuestion;
         } else {
             throw new Error("Failed to generate follow-up questions from OpenAIl, message content is null");
