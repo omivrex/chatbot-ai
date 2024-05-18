@@ -70,6 +70,16 @@ The body should be a JSON object containing a `message` field:
 }
 ```
 
+### Example Request
+
+```curl
+curl -X POST http://localhost:3000/api/chat \
+-H "Content-Type: application/json" \
+-d '{
+  "message": "Which country has the highest number of billionaires in the world?"
+}'
+```
+
 #### Response
 
 The response will also be a JSON object containing a `response` field, and a `followUpQuestions` field:
@@ -93,5 +103,11 @@ The response will also be a JSON object containing a `response` field, and a `fo
     ]
 }
 ```
+
+## Best Practices
+
+-   **Error Handling**: The API implements robust error handling techniques to gracefully handle errors and provide informative error messages to clients. Error handling middleware is used to centralize error management.
+-   **Token Management**: To ensure compliance with the maximum token limit of the GPT-3.5-turbo model, helper functions are employed to estimate the number of tokens in messages and manage the messages array. The `truncateMessages` function is used to remove older messages when the total token count exceeds the limit.
+-   **Caching**: For improved performance and scalability, it is recommended to implement a caching system such as Redis to store and manage the messages array. This can help reduce the load on the server and enhance response times.
 
 ### Thanks!
