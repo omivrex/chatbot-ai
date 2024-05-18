@@ -114,7 +114,7 @@ The response will also be a JSON object containing a `response` field, and a `fo
         -   `middlewares/`: Contains middleware functions for tasks such as error handling and input validation.
         -   `routes/`: Defines the API routes.
         -   `configs/`: Contains configuration files.
-        -   `utils/`: Utility functions.
+        -   `helpers/`: Utility functions.
         -   `types/`: TypeScript type definitions.
 
 -   **Robust Input Validation**: Input validation is implemented to ensure that the API receives valid data. Invalid inputs are handled gracefully by sending appropriate error responses. This prevents unexpected behavior and improves security.
