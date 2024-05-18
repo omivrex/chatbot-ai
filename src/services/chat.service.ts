@@ -1,16 +1,19 @@
 import { config } from "../configs/config";
+import { truncateMessages } from "../helpers/messageCacheTruncator.helper";
 import { Message } from "../types/messages.types";
 
 const OpenAi = config.openAi;
+const MAX_TOKENS = 4097; // gpt-3.5-turbo max tokens
 
 // The appropriate way to store this is using a caching service like redis
-const messages: Message[] = [{ role: "system", content: "Be a good assistant" }];
+const messagesCache: Message[] = [{ role: "system", content: "Be a good assistant" }];
+
 export async function generateResponse(message: string): Promise<Message | undefined> {
     try {
         const userPrompt: Message = { role: "user", content: message };
-        messages.push(userPrompt);
+        messagesCache.push(userPrompt);
         const chatCompletion = await OpenAi.chat.completions.create({
-            messages,
+            messages: truncateMessages(messagesCache, MAX_TOKENS),
             model: "gpt-3.5-turbo",
         });
         if (chatCompletion.choices[0].message.content) {
@@ -18,7 +21,7 @@ export async function generateResponse(message: string): Promise<Message | undef
                 role: "assistant",
                 content: chatCompletion.choices[0].message.content,
             };
-            messages.push(aiResponse);
+            messagesCache.push(aiResponse);
             return aiResponse;
         } else {
             throw new Error("Failed to get response from OpenAIl, message content is null");
@@ -36,7 +39,7 @@ const FOLLOWUP_QUESTION_PROMPT: Message = {
 export async function suggestFollowUpQuestions(): Promise<void> {
     try {
         const chatCompletion = await OpenAi.chat.completions.create({
-            messages: [...messages, FOLLOWUP_QUESTION_PROMPT],
+            messages: truncateMessages([...messagesCache, FOLLOWUP_QUESTION_PROMPT], MAX_TOKENS),
             model: "gpt-3.5-turbo",
         });
         if (chatCompletion.choices[0].message.content) {
