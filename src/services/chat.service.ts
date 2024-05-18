@@ -47,7 +47,7 @@ export async function suggestFollowUpQuestions(): Promise<void> {
             const followupQuestion = JSON.parse(response);
             return followupQuestion;
         } else {
-            throw new Error("Failed to generate follow-up questions from OpenAIl, message content is null");
+            throw new Error("Failed to generate follow-up questions from OpenAI, message content is null");
         }
     } catch (error) {
         throw error;
