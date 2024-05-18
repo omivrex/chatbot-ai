@@ -106,6 +106,21 @@ The response will also be a JSON object containing a `response` field, and a `fo
 
 ## Best Practices
 
+-   **Separation of Concerns**: The project is structured to separate different aspects of the application, making it easier to manage and scale. The folder structure typically includes:
+
+    -   `src/`: Contains the source code.
+        -   `controllers/`: Handles incoming requests and responses.
+        -   `services/`: Contains the business logic.
+        -   `middlewares/`: Contains middleware functions for tasks such as error handling and input validation.
+        -   `routes/`: Defines the API routes.
+        -   `configs/`: Contains configuration files.
+        -   `utils/`: Utility functions.
+        -   `types/`: TypeScript type definitions.
+
+-   **Robust Input Validation**: Input validation is implemented to ensure that the API receives valid data. Invalid inputs are handled gracefully by sending appropriate error responses. This prevents unexpected behavior and improves security.
+
+-   **Readable and Maintainable Code**: The code is written following clean code principles to ensure readability and maintainability. This includes meaningful naming conventions, modular functions, and proper documentation.
+
 -   **Error Handling**: The API implements robust error handling techniques to gracefully handle errors and provide informative error messages to clients. Error handling middleware is used to centralize error management.
 -   **Token Management**: To ensure compliance with the maximum token limit of the GPT-3.5-turbo model, helper functions are employed to estimate the number of tokens in messages and manage the messages array. The `truncateMessages` function is used to remove older messages when the total token count exceeds the limit.
 -   **Caching**: For improved performance and scalability, it is recommended to implement a caching system such as Redis to store and manage the messages array. This can help reduce the load on the server and enhance response times.
