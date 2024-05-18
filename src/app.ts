@@ -6,10 +6,9 @@ import { requestLogger } from "./middlewares/requestLogger.middleware";
 const app = express();
 
 app.use(express.json());
-app.use(requestLogger); // Use the request logger middleware
+app.use(requestLogger);
 app.use("/api", chatRoutes);
 
-// Error handling middleware should be the last one to use
 app.use(errorHandler);
 
 export default app;
